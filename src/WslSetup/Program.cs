@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -13,13 +13,16 @@ namespace WslSetup
         {
             if (!IsWslEnabled())
             {
+                EnableWsl();
                 AddSelfToStartup();
+                // Reboot(10);
             }
 
             // TODO: Do more stuffs here.
             RemoveSelfFromStartup();
-
-            Console.WriteLine(currentExecutableFile);
+            
+            Console.WriteLine("Press a key to exit...");
+            Console.ReadKey();
         }
 
         #region Methods
@@ -124,7 +127,7 @@ namespace WslSetup
         }
 
         /// <summary>
-        /// Run an external program and pauses script execution until the program finishes.
+        /// Run an external program and pause the execution until the program finishes.
         /// </summary>
         /// <param name="programPath">The full path of the program.</param>
         /// <param name="programArgs">The arguments of the program.</param>
@@ -155,6 +158,15 @@ namespace WslSetup
             var output = process.StandardOutput.ReadToEnd();
 
             return string.IsNullOrWhiteSpace(output) ? null : output;
+        }
+
+        /// <summary>
+        /// Reboot the Windows system.
+        /// </summary>
+        /// <param name="afterSeconds">The number of seconds after which the system will reboot.</param>
+        public static void Reboot(int afterSeconds)
+        {
+            Process.Start("cmd.exe", $"/c shutdown /r /f /t {afterSeconds}");
         }
 
         #endregion Requirements
