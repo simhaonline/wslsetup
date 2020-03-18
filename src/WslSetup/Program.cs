@@ -16,7 +16,8 @@ namespace WslSetup
                 AddSelfToStartup();
             }
 
-            var currentExecutableFile = Assembly.GetExecutingAssembly().Location;
+            // TODO: Do more stuffs here.
+            RemoveSelfFromStartup();
 
             Console.WriteLine(currentExecutableFile);
         }
@@ -88,6 +89,16 @@ namespace WslSetup
             var executableFile = Assembly.GetExecutingAssembly().GetName().CodeBase;
             AddToStartup(executableName, executableFile);
         }
+
+        /// <summary>
+        /// Remove the current executable from the Windows startup.
+        /// </summary>
+        static void RemoveSelfFromStartup()
+        {
+            var executableName = Assembly.GetExecutingAssembly().GetName().Name;
+            RemoveFromStartup(executableName);
+        }
+
         /// <summary>
         /// Run an external program with arguments.
         /// </summary>
