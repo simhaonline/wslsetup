@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -13,7 +13,7 @@ namespace WslSetup
         {
             if (!IsWslEnabled())
             {
-                Console.WriteLine("Add current executable to the Windows startup...");
+                AddSelfToStartup();
             }
 
             var currentExecutableFile = Assembly.GetExecutingAssembly().Location;
@@ -79,6 +79,15 @@ namespace WslSetup
             key.Close();
         }
 
+        /// <summary>
+        /// Add the current executable to the Windows startup.
+        /// </summary>
+        static void AddSelfToStartup()
+        {
+            var executableName = Assembly.GetExecutingAssembly().GetName().Name;
+            var executableFile = Assembly.GetExecutingAssembly().GetName().CodeBase;
+            AddToStartup(executableName, executableFile);
+        }
         /// <summary>
         /// Run an external program with arguments.
         /// </summary>
