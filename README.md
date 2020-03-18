@@ -6,4 +6,4 @@
 
 <h1 align="center">WslSetup</h1>
 
-<p align="center">Setup WSL on Windows automatically.</p>
+<p align="center">Setup WSL with Ubuntu 18.04 on Windows automatically.</p>

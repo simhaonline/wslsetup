@@ -15,12 +15,13 @@ namespace WslSetup
             {
                 EnableWsl();
                 AddSelfToStartup();
-                // Reboot(10);
+                Reboot(10);
             }
 
-            // TODO: Do more stuffs here.
             RemoveSelfFromStartup();
-            
+            InstallUbuntu();
+            UpgradeUbuntu();
+
             Console.WriteLine("Press a key to exit...");
             Console.ReadKey();
         }
@@ -34,6 +35,7 @@ namespace WslSetup
         {
             RunWait("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart");
             RunWait("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
+            RunWait("wsl.exe", "--set-default-version 2");
         }
 
         /// <summary>
@@ -54,6 +56,23 @@ namespace WslSetup
 
             client.DownloadFile("https://aka.ms/wsl-ubuntu-1804", ubuntuAppx);
             RunPowerShell($"Add-AppxPackage {ubuntuAppx}");
+
+            RunWait("ubuntu1804.exe", "install --root");
+            RunWait("wsl.exe", "-s Ubuntu-18.04");
+            RunWait("wsl.exe", "--set-version Ubuntu-18.04 2");
+        }
+
+        /// <summary>
+        /// Update and upgrade Ubuntu.
+        /// </summary>
+        static void UpgradeUbuntu()
+        {
+            // Sub-process /usr/bin/dpkg returned an error code (1)" error.
+            RunWait("ubuntu1804.exe", "rm -f /var/lib/dpkg/info/*");
+            RunWait("ubuntu1804.exe", "rm -rf /var/cache/apt/archives/*");
+
+            RunWait("ubuntu1804.exe", "run apt update");
+            RunWait("ubuntu1804.exe", "run apt upgrade -y");
         }
 
         #endregion Methods
@@ -89,7 +108,8 @@ namespace WslSetup
         static void AddSelfToStartup()
         {
             var executableName = Assembly.GetExecutingAssembly().GetName().Name;
-            var executableFile = Assembly.GetExecutingAssembly().GetName().CodeBase;
+            // var executableFile = Assembly.GetExecutingAssembly().GetName().CodeBase;
+            var executableFile = Assembly.GetExecutingAssembly().Location;
             AddToStartup(executableName, executableFile);
         }
 
@@ -155,7 +175,7 @@ namespace WslSetup
         public static string RunPowerShellWithOutput(string command)
         {
             var process = RunPowerShell(command);
-            var output = process.StandardOutput.ReadToEnd();
+            var output = process.StandardOutput.ReadToEnd().ToString().TrimEnd(Environment.NewLine.ToCharArray());
 
             return string.IsNullOrWhiteSpace(output) ? null : output;
         }
