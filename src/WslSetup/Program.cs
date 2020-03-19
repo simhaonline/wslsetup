@@ -109,7 +109,8 @@ namespace WslSetup
         {
             var executableName = Assembly.GetExecutingAssembly().GetName().Name;
             // var executableFile = Assembly.GetExecutingAssembly().GetName().CodeBase;
-            var executableFile = Assembly.GetExecutingAssembly().Location;
+            // var executableFile = Assembly.GetExecutingAssembly().Location;
+            var executableFile = Process.GetCurrentProcess().MainModule.FileName;
             AddToStartup(executableName, executableFile);
         }
 
