@@ -40,11 +40,10 @@ namespace WslSetup
         /// </summary>
         static void EnableWsl()
         {
-        //     RunWait("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart");
-        //     RunWait("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
-
-            Process.Start("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
-            Process.Start("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
+            // RunWait("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart");
+            // RunWait("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
+            Process.Start("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart").WaitForExit();
+            Process.Start("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart").WaitForExit();
             // RunWait("dism.exe", "/online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart");
             // RunWait("dism.exe", "/online /disable-feature /featurename:VirtualMachinePlatform /norestart");
             // RunWait("wsl.exe", "--set-default-version 2");
