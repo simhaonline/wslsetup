@@ -13,13 +13,20 @@ namespace WslSetup
         {
             if (!IsWslEnabled())
             {
+                Console.WriteLine("Enable WSL2...");
                 EnableWsl();
+                Console.WriteLine("Add to startup...");
                 AddSelfToStartup();
+                Console.WriteLine("Reboot the system...");
                 Reboot(10);
             }
 
+            Console.WriteLine("Remove from startup...");
             RemoveSelfFromStartup();
+
+            Console.WriteLine("Download and install Ubuntu...");
             InstallUbuntu();
+            Console.WriteLine("Update and upgrade Ubuntu...");
             UpgradeUbuntu();
 
             Console.WriteLine("Press a key to exit...");
