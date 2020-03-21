@@ -17,7 +17,10 @@
 
 ```shell
 git clone https://github.com/lanzorg/wslsetup.git
+
 cd .\wslsetup\src\WslSetup\
+
 dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
-.\bin\Release\netcoreapp3.1\win-x64\publish\WslSetup.exe
+
+.\bin\Release\netcoreapp*\win-x64\publish\WslSetup.exe
 ```
