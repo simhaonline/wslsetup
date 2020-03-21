@@ -42,7 +42,9 @@ namespace WslSetup
         {
             RunWait("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart");
             RunWait("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
-            RunWait("wsl.exe", "--set-default-version 2");
+            // RunWait("dism.exe", "/online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart");
+            // RunWait("dism.exe", "/online /disable-feature /featurename:VirtualMachinePlatform /norestart");
+            // RunWait("wsl.exe", "--set-default-version 2");
         }
 
         /// <summary>
