@@ -10,17 +10,19 @@
 
 ## Requirements
 
-* Windows 10 x64 build 18917 or higher.
 * Administrator rights.
+* Windows 10 x64 build 18917 or higher.
 
-## Build & Run
+## Build
 
 ```shell
 git clone https://github.com/lanzorg/wslsetup.git
-
 cd .\wslsetup\src\WslSetup\
-
 dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
+```
 
+## Run
+
+```shell
 .\bin\Release\netcoreapp*\win-x64\publish\WslSetup.exe
 ```
