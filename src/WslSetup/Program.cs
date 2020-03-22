@@ -15,17 +15,18 @@ namespace WslSetup
             {
                 Console.WriteLine("Enable WSL2...");
                 EnableWsl();
-                Console.WriteLine("Add to startup...");
-                AddSelfToStartup();
+                // Console.WriteLine("Add to startup...");
+                // AddSelfToStartup();
                 Console.WriteLine("Reboot the system...");
-                Reboot(10);
+                Reboot(3);
             }
 
-            Console.WriteLine("Remove from startup...");
-            RemoveSelfFromStartup();
+            // Console.WriteLine("Remove from startup...");
+            // RemoveSelfFromStartup();
 
             Console.WriteLine("Download and install Ubuntu...");
             InstallUbuntu();
+
             Console.WriteLine("Update and upgrade Ubuntu...");
             UpgradeUbuntu();
 
@@ -40,13 +41,17 @@ namespace WslSetup
         /// </summary>
         static void EnableWsl()
         {
-            // RunWait("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart");
-            // RunWait("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart");
             Process.Start("dism.exe", "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart").WaitForExit();
             Process.Start("dism.exe", "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart").WaitForExit();
-            // RunWait("dism.exe", "/online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart");
-            // RunWait("dism.exe", "/online /disable-feature /featurename:VirtualMachinePlatform /norestart");
-            // RunWait("wsl.exe", "--set-default-version 2");
+        }
+
+        /// <summary>
+        /// Disable the Microsoft Windows Subsystem for Linux feature.
+        /// </summary>
+        static void DisableWsl()
+        {
+            Process.Start("dism.exe", "/online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart").WaitForExit();
+            Process.Start("dism.exe", "/online /disable-feature /featurename:VirtualMachinePlatform /norestart").WaitForExit();
         }
 
         /// <summary>
@@ -62,15 +67,28 @@ namespace WslSetup
         /// </summary>
         static void InstallUbuntu()
         {
+            if (IsUbuntuInstalled())
+            {
+                return;
+            }
+
             var ubuntuAppx = Path.Combine(Path.GetTempPath(), "Ubuntu.Appx");
             var client = new WebClient();
 
             client.DownloadFile("https://aka.ms/wsl-ubuntu-1804", ubuntuAppx);
             RunPowerShell($"Add-AppxPackage {ubuntuAppx}");
 
-            RunWait("ubuntu1804.exe", "install --root");
-            RunWait("wsl.exe", "-s Ubuntu-18.04");
-            RunWait("wsl.exe", "--set-version Ubuntu-18.04 2");
+            Process.Start("ubuntu1804.exe", "install --root").WaitForExit();
+            Process.Start("wsl.exe", "-s Ubuntu-18.04").WaitForExit();
+            Process.Start("wsl.exe", "--set-version Ubuntu-18.04 2").WaitForExit();
+        }
+
+        /// <summary>
+        /// Check if Ubuntu 18.04 is installed.
+        /// </summary>
+        static bool IsUbuntuInstalled()
+        {
+            return RunPowerShellWithOutput("(Get-Command -ErrorAction SilentlyContinue ubuntu1804) -ne $null") == "True";
         }
 
         /// <summary>
@@ -78,12 +96,8 @@ namespace WslSetup
         /// </summary>
         static void UpgradeUbuntu()
         {
-            // Sub-process /usr/bin/dpkg returned an error code (1)" error.
-            RunWait("ubuntu1804.exe", "rm -f /var/lib/dpkg/info/*");
-            RunWait("ubuntu1804.exe", "rm -rf /var/cache/apt/archives/*");
-
-            RunWait("ubuntu1804.exe", "run apt update");
-            RunWait("ubuntu1804.exe", "run apt upgrade -y");
+            Process.Start("ubuntu1804.exe", "run apt update").WaitForExit();
+            Process.Start("ubuntu1804.exe", "run UCF_FORCE_CONFOLD=1 DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade -y").WaitForExit();
         }
 
         #endregion Methods
@@ -119,7 +133,6 @@ namespace WslSetup
         static void AddSelfToStartup()
         {
             var executableName = Assembly.GetExecutingAssembly().GetName().Name;
-            // var executableFile = Assembly.GetExecutingAssembly().GetName().CodeBase;
             // var executableFile = Assembly.GetExecutingAssembly().Location;
             var executableFile = Process.GetCurrentProcess().MainModule.FileName;
             AddToStartup(executableName, executableFile);
@@ -198,7 +211,8 @@ namespace WslSetup
         /// <param name="afterSeconds">The number of seconds after which the system will reboot.</param>
         public static void Reboot(int afterSeconds)
         {
-            Process.Start("cmd.exe", $"/c shutdown /r /f /t {afterSeconds}");
+            Process.Start("cmd.exe", $"/c shutdown /r /f /t {afterSeconds}").WaitForExit();
+            Environment.Exit(0);
         }
 
         #endregion Requirements
