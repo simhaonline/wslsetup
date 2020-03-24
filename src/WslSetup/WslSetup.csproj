@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PublishSingleFile>true</PublishSingleFile>
     <PublishTrimmed>true</PublishTrimmed>
