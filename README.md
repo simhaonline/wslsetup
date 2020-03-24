@@ -18,7 +18,7 @@
 ```shell
 git clone https://github.com/lanzorg/wslsetup.git
 cd .\wslsetup\src\WslSetup\
-dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
+dotnet publish -c Release
 ```
 
 ## Run
