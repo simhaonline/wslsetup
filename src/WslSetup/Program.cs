@@ -144,40 +144,30 @@ namespace WslSetup
         }
 
         /// <summary>
-        /// Get file name from an URL.
-        /// </summary>
-        /// <param name="url">The URL.</param>
-        static async Task<string> GetFileName(string url)
-        {
-            using (var client = new HttpClient())
-            using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
-            {
-                return response.Content.Headers.ContentDisposition?.FileName.Replace("\"", "").Replace("'", "")
-                    ?? response.RequestMessage.RequestUri.Segments[^1];
-            }
-        }
-
-        /// <summary>
         /// Download file from URL.
         /// </summary>
         /// <param name="url">The URL of the file.</param>
         static async Task<string> DownloadFromUrl(string url)
         {
-            var downloadDirectory = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
-            var downloadedFile = Path.Combine(downloadDirectory.FullName, await GetFileName(url));
-
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0");
                 using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
-                using (var streamToReadFrom = await response.Content.ReadAsStreamAsync())
-                using (var streamToReadTo = File.Open(downloadedFile, FileMode.Create))
                 {
-                    await streamToReadFrom.CopyToAsync(streamToReadTo);
+                    var downloadedFile = Path.Combine(
+                        Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())).FullName,
+                        response.Content.Headers.ContentDisposition?.FileName.Replace("\"", "").Replace("'", "") ?? response.RequestMessage.RequestUri.Segments[^1]
+                    );
+
+                    using (var streamToReadFrom = await response.Content.ReadAsStreamAsync())
+                    using (var streamToReadTo = File.Open(downloadedFile, FileMode.Create))
+                    {
+                        await streamToReadFrom.CopyToAsync(streamToReadTo);
+                    }
+
+                    return downloadedFile;
                 }
             }
-
-            return downloadedFile;
         }
     }
 }
